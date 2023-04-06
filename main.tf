@@ -192,10 +192,7 @@ resource "aws_launch_template" "jenkins_lt" {
 
   tag_specifications {
     resource_type = "instance"
-    Terraform   = "true"
-    Environment = "dev"
-    service = "jenkins"
-  }
+   
     
   tags = {
       Name = "jenkins-lt"
@@ -203,7 +200,7 @@ resource "aws_launch_template" "jenkins_lt" {
       Environment = "dev"
       service = "jenkins"
     }
-  
+}
   
 }
   
