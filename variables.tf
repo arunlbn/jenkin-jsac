@@ -3,14 +3,14 @@ variable amiid  {
   default = ""    
 }
 
-variable instance_type {
+variable instancetype {
   type = string 
   default = "" 
 
 }
 
 
-variable key_name {
+variable sshkey {
   type = string
   default = ""
 }
