@@ -56,7 +56,7 @@ resource "aws_security_group" "jenkins_service_sg" {
       from_port   = egress.value
       to_port     = egress.value
       protocol    = "-1"
-      cidr_blocks = [module.vpc.vpc_cidr_block]
+      cidr_blocks = [0.0.0.0/0]
     }
   }
 
@@ -130,21 +130,21 @@ resource "aws_efs_file_system" "jenkins_efs" {
    
 resource "aws_efs_mount_target" "az1" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
-  subnet_id      = module.vpc.private_subnets[0]
+  subnet_id      = module.vpc.public_subnets[0]
   security_groups = [aws_security_group.jenkins_service_sg.id]
      
 }
   
 resource "aws_efs_mount_target" "az2" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
-  subnet_id      = module.vpc.private_subnets[1]
+  subnet_id      = module.vpc.public_subnets[1]
   security_groups = [aws_security_group.jenkins_service_sg.id]
       
 } 
   
 resource "aws_efs_mount_target" "az3" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
-  subnet_id      = module.vpc.private_subnets[2]
+  subnet_id      = module.vpc.public_subnets[2]
   security_groups = [aws_security_group.jenkins_service_sg.id] 
      
 }
@@ -210,7 +210,7 @@ resource "aws_launch_template" "jenkins_lt" {
 }
   
 resource "aws_autoscaling_group" "jenkins_asg" {
-  vpc_zone_identifier       = [ module.vpc.private_subnets[0], module.vpc.private_subnets[1], module.vpc.private_subnets[2] ]
+  vpc_zone_identifier       = [ module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2] ]
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
