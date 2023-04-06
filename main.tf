@@ -63,6 +63,122 @@ resource "aws_security_group" "jenkins_service_sg" {
   }  
 }
 
+resource "aws_security_group" "efs_sg" {
+  name        = "efs-service"
+  description = "Security group for efs with custom ports open within VPC"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+      description = "Traffic from EC2"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      security_groups = [aws_security_group.jenkins_service_sg.id]
+    }
+  
+  dynamic "egress" {
+    for_each = toset(local.ports_out)
+    content {
+      description = "All traffic to EC2"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      security_groups = [aws_security_group.jenkins_service_sg.id]
+    }
+  }
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }  
+}
+  
+  
+resource "aws_efs_file_system" "jenkins_efs" {
+  creation_token = "jenkins-efs"
+  encrypted = "true"
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }
+}
+  
+ 
+resource "aws_efs_mount_target" "az1" {
+  file_system_id = aws_efs_file_system.jenkins_efs.id
+  subnet_id      = module.vpc.private_subnets[0]
+  security_groups = [aws_security_group.jenkins_service_sg.id]
+  
+  
+    tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }   
+    
+}
+  
+resource "aws_efs_mount_target" "az2" {
+  file_system_id = aws_efs_file_system.jenkins_efs.id
+  subnet_id      = module.vpc.private_subnets[1]
+  security_groups = [aws_security_group.jenkins_service_sg.id]
+  
+    tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }   
+    
+} 
+  
+resource "aws_efs_mount_target" "az3" {
+  file_system_id = aws_efs_file_system.jenkins_efs.id
+  subnet_id      = module.vpc.private_subnets[2]
+  security_groups = [aws_security_group.jenkins_service_sg.id]
+  
+    tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }   
+    
+}
+  
+ 
+  
+data "aws_iam_policy_document" "policy" {
+  statement {
+    sid    = "efsaccesspolicy"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+
+    actions = [
+      "elasticfilesystem:ClientMount",
+      "elasticfilesystem:ClientWrite",
+    ]
+
+    resources = [aws_efs_file_system.fs.arn]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+  }
+}
+
+resource "aws_efs_file_system_policy" "policy" {
+  file_system_id                     = aws_efs_file_system.jenkins_efs.id
+  bypass_policy_lockout_safety_check = true
+  policy                             = data.aws_iam_policy_document.policy.json
+}
 
 module "ec2_instance" {
   source  = "terraform-aws-modules/ec2-instance/aws"
