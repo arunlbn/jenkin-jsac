@@ -210,7 +210,7 @@ resource "aws_launch_template" "jenkins_lt" {
 }
   
 resource "aws_autoscaling_group" "jenkins_asg" {
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  vpc_zone_identifier       = [ module.vpc.private_subnets[0], module.vpc.private_subnets[1], module.vpc.private_subnets[2] ]
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
