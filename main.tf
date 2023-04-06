@@ -221,7 +221,7 @@ resource "aws_lb" "jenkins_lab" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.jenkins_alb_sg.id]
-  subnets            = [module.vpc.public_subnets]
+  subnets            = [module.vpc.public_subnets[0], module.vpc.public_subnets[1], module.vpc.public_subnets[2] ]
 
   enable_deletion_protection = false
 
