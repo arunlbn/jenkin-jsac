@@ -233,6 +233,7 @@ resource "aws_autoscaling_group" "jenkins_asg" {
   desired_capacity   = 1
   max_size           = 1
   min_size           = 1
+  target_group_arns = aws_lb_target_group.jenkins_tg.arn
 
   launch_template {
     id      = aws_launch_template.jenkins_lt.id
