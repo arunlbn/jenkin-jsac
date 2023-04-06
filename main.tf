@@ -17,8 +17,7 @@ module "vpc" {
     service = "jenkins"
   }
 }
-  
-  
+    
   
 locals {
   ports_in = [
@@ -105,33 +104,26 @@ resource "aws_efs_file_system" "jenkins_efs" {
     service = "jenkins"
   }
 }
-  
- 
+   
 resource "aws_efs_mount_target" "az1" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.private_subnets[0]
   security_groups = [aws_security_group.jenkins_service_sg.id]
-  
- 
-    
+     
 }
   
 resource "aws_efs_mount_target" "az2" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.private_subnets[1]
   security_groups = [aws_security_group.jenkins_service_sg.id]
-  
-  
-    
+      
 } 
   
 resource "aws_efs_mount_target" "az3" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.private_subnets[2]
-  security_groups = [aws_security_group.jenkins_service_sg.id]
-  
- 
-    
+  security_groups = [aws_security_group.jenkins_service_sg.id] 
+     
 }
   
  
@@ -185,4 +177,29 @@ module "ec2_instance" {
     Environment = "dev"
     service = "jenkins"
   }
+}
+   
+  
+resource "aws_launch_template" "jenkins_lt" {
+  name = "jenkins-lt"
+  iam_instance_profile {
+    name = "test"
+  }
+  image_id = var.amiid
+  instance_type = var.instancetype
+  key_name = var.sshkey
+  monitoring {
+    enabled = true
+  }
+
+ vpc_security_group_ids = [aws_security_group.jenkins_service_sg.id]
+
+  tag_specifications {
+    resource_type = "instance"
+
+  tags = {
+      Name = "test"
+    }
+  }
+  
 }
