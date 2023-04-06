@@ -24,7 +24,7 @@ module "jenkins_service_sg" {
 
   name        = "jenkins-service"
   description = "Security group for jenkins-service with custom ports open within VPC, and PostgreSQL publicly open"
-  vpc_id      = module.vpc.vpcid
+  vpc_id      = module.vpc.vpc_id
 
   ingress_cidr_blocks      = ["0.0.0.0/0"]
   ingress_rules            = ["ssh-tcp"]
@@ -39,6 +39,12 @@ module "jenkins_service_sg" {
   ]
 egress_cidr_blocks = ["0.0.0.0/0"]
 egress_rules = ["any"]
+    
+ tags = {
+    Terraform   = "true"
+    Environment = "dev"
+    service = "jenkins"
+  }    
 
 }
 
