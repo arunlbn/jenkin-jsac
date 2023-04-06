@@ -74,7 +74,7 @@ module "ec2_instance" {
   instance_type          = var.instancetype
   key_name               = var.sshkey
   monitoring             = true
-  vpc_security_group_ids = aws_security_group.jenkins_service_sg.id
+  vpc_security_group_ids = [aws_security_group.jenkins_service_sg.id]
   subnet_id              = module.vpc.private_subnets[0]
 
   tags = {
