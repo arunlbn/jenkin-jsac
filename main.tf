@@ -17,36 +17,43 @@ module "vpc" {
     service = "jenkins"
   }
 }
+  
+  
+  
+locals {
+  ports_in = [
+    22,
+    8080
+  ]
+  ports_out = [
+    0
+  ]
+}
 
 resource "aws_security_group" "jenkins_service_sg" {
   name        = "jenkins-service"
   description = "Security group for jenkins-service with custom ports open within VPC, and PostgreSQL publicly open"
   vpc_id      = module.vpc.vpc_id
 
-  ingress {
-    description      = "SSH from anywhere"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  },
-  {  
-    description      = "Jenkins from anywhere"
-    from_port        = 8080
-    to_port          = 8080
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  } 
-    
-
-    
-  
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
+   dynamic "ingress" {
+    for_each = toset(local.ports_in)
+    content {
+      description = "SSH Jenkins Traffic from internet"
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
+  }
+  dynamic "egress" {
+    for_each = toset(local.ports_out)
+    content {
+      description = "All traffic to internet"
+      from_port   = egress.value
+      to_port     = egress.value
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   tags = {
