@@ -159,32 +159,10 @@ resource "aws_efs_file_system_policy" "policy" {
   policy                             = data.aws_iam_policy_document.policy.json
 }
 
-module "ec2_instance" {
-  source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "~> 3.0"
-
-  name = "jenkins-master"
-
-  ami                    = var.amiid
-  instance_type          = var.instancetype
-  key_name               = var.sshkey
-  monitoring             = true
-  vpc_security_group_ids = [aws_security_group.jenkins_service_sg.id]
-  subnet_id              = module.vpc.private_subnets[0]
-
-  tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    service = "jenkins"
-  }
-}
-   
   
 resource "aws_launch_template" "jenkins_lt" {
   name = "jenkins-lt"
-  iam_instance_profile {
-    name = "test"
-  }
+ 
   image_id = var.amiid
   instance_type = var.instancetype
   key_name = var.sshkey
