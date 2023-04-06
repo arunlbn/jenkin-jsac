@@ -187,3 +187,16 @@ resource "aws_launch_template" "jenkins_lt" {
   }
   
 }
+  
+resource "aws_autoscaling_group" "jenkins-asg" {
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  desired_capacity   = 1
+  max_size           = 1
+  min_size           = 1
+
+  launch_template {
+    id      = aws_launch_template.jenkins_lt.id
+    version = "$Latest"
+  }
+}
+
