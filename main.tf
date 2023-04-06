@@ -35,11 +35,7 @@ module "jenkins_service_sg" {
       protocol    = "tcp"
       description = "jenkins-service ports"
       cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      rule        = "postgresql-tcp"
-      cidr_blocks = "0.0.0.0/0"
-    },
+    }
   ]
 egress_cidr_blocks = ["0.0.0.0/0"]
 egress_rules = ["any"]
@@ -56,10 +52,10 @@ module "ec2_instance" {
   name = "jenkins-master"
 
   ami                    = var.amiid
-  instance_type          = "t4g.small"
+  instance_type          = var.instancetype
   key_name               = var.sshkey
   monitoring             = true
-  vpc_security_group_ids = module.
+  vpc_security_group_ids = module.jenkins_service_sg.security_group_id
   subnet_id              = module.vpc.private_subnets.[0]
 
   tags = {
