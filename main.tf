@@ -56,7 +56,7 @@ module "ec2_instance" {
   key_name               = var.sshkey
   monitoring             = true
   vpc_security_group_ids = module.jenkins_service_sg.security_group_id
-  subnet_id              = module.vpc.private_subnets.[0]
+  subnet_id              = module.vpc.private_subnets[0]
 
   tags = {
     Terraform   = "true"
