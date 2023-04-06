@@ -18,37 +18,43 @@ module "vpc" {
   }
 }
 
-
-module "jenkins_service_sg" {
-  source = "terraform-aws-modules/security-group/aws"
-
+resource "aws_security_group" "jenkins_service_sg" {
   name        = "jenkins-service"
   description = "Security group for jenkins-service with custom ports open within VPC, and PostgreSQL publicly open"
   vpc_id      = module.vpc.vpc_id
 
-  ingress_cidr_blocks      = ["0.0.0.0/0"]
-  ingress_rules            = ["ssh-tcp"]
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 8080
-      to_port     = 8080
-      protocol    = "tcp"
-      description = "jenkins-service ports"
-      cidr_blocks = "0.0.0.0/0"
-    }
-  ]
-egress_cidr_blocks = ["0.0.0.0/0"]
-egress_rules = ["any"]
+  ingress [{
+    description      = "SSH from anywhere"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  },
     
- tags = {
+    description      = "Jenkins from anywhere"
+    from_port        = 8080
+    to_port          = 8080
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }, 
+    
+
+    
+  ]
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
     Terraform   = "true"
     Environment = "dev"
     service = "jenkins"
-  }    
-
+  }  
 }
-
-
 
 
 module "ec2_instance" {
@@ -61,7 +67,7 @@ module "ec2_instance" {
   instance_type          = var.instancetype
   key_name               = var.sshkey
   monitoring             = true
-  vpc_security_group_ids = module.jenkins_service_sg.security_group_id
+  vpc_security_group_ids = jenkins_service_sg.id
   subnet_id              = module.vpc.private_subnets[0]
 
   tags = {
