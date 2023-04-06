@@ -107,7 +107,14 @@ resource "aws_security_group" "jenkins_alb_sg" {
       protocol    = "tcp"
       cidr_blocks = ["0.0.0.0/0"]
     }
-  
+    
+  egress {
+      description = "All traffic to EC2"
+      from_port   = 0
+      to_port     = 0
+      protocol    = "-1"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
   
   tags = {
     Terraform   = "true"
@@ -130,21 +137,21 @@ resource "aws_efs_file_system" "jenkins_efs" {
 resource "aws_efs_mount_target" "az1" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.public_subnets[0]
-  security_groups = [aws_security_group.jenkins_service_sg.id]
+  security_groups = [aws_security_group.efs_sg.id]
      
 }
   
 resource "aws_efs_mount_target" "az2" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.public_subnets[1]
-  security_groups = [aws_security_group.jenkins_service_sg.id]
+  security_groups = [aws_security_group.efs_sg.id]
       
 } 
   
 resource "aws_efs_mount_target" "az3" {
   file_system_id = aws_efs_file_system.jenkins_efs.id
   subnet_id      = module.vpc.public_subnets[2]
-  security_groups = [aws_security_group.jenkins_service_sg.id] 
+  security_groups = [aws_security_group.efs_sg.id] 
      
 }
   
