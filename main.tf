@@ -202,7 +202,7 @@ resource "aws_launch_template" "jenkins_lt" {
  vpc_security_group_ids = [aws_security_group.jenkins_service_sg.id]
   
  user_data = "${base64encode(<<EOF
- #!/bin/bash
+ #!/bin/sh
  curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | \
          sudo tee   /usr/share/keyrings/jenkins-keyring.asc > /dev/null
  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]  \
