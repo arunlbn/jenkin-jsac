@@ -112,12 +112,7 @@ resource "aws_efs_mount_target" "az1" {
   subnet_id      = module.vpc.private_subnets[0]
   security_groups = [aws_security_group.jenkins_service_sg.id]
   
-  
-    tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    service = "jenkins"
-  }   
+ 
     
 }
   
@@ -126,11 +121,7 @@ resource "aws_efs_mount_target" "az2" {
   subnet_id      = module.vpc.private_subnets[1]
   security_groups = [aws_security_group.jenkins_service_sg.id]
   
-    tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    service = "jenkins"
-  }   
+  
     
 } 
   
@@ -139,11 +130,7 @@ resource "aws_efs_mount_target" "az3" {
   subnet_id      = module.vpc.private_subnets[2]
   security_groups = [aws_security_group.jenkins_service_sg.id]
   
-    tags = {
-    Terraform   = "true"
-    Environment = "dev"
-    service = "jenkins"
-  }   
+ 
     
 }
   
